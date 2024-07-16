@@ -2,12 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using DG.Tweening;
+using System;
 
 public class CardController : MonoBehaviour
 {
+    public event Action<CardController> OnCardClicked;
     [SerializeField] private Sprite _backSprite;
     [SerializeField] private Button _cardButton;
-    
     private Image _cardImage;
     private Sprite _frontSprite;
     private bool _isFlipped;
@@ -15,6 +16,7 @@ public class CardController : MonoBehaviour
     private bool _turning;
     private GameManager _gameManager;
     private Sequence _sequence;
+
 
     [Inject]
     public void Construct(GameManager gameManager)
@@ -26,23 +28,23 @@ public class CardController : MonoBehaviour
     {
         _cardImage = GetComponent<Image>();
         _cardButton = GetComponent<Button>();
-        _cardButton.onClick.AddListener(OnClick);
+        _cardButton.onClick.AddListener(HandleClick);
         ShowBack();
     }
 
     private void OnDestroy()
     {
-        _cardButton.onClick.RemoveListener(OnClick);
+        _cardButton.onClick.RemoveListener(HandleClick);
     }
 
-    public void OnClick()
+    private void HandleClick()
     {
         if (_turning || _isMatched || _isFlipped)
         {
             return;
         }
 
-        _gameManager.OnCardClicked(this);
+        OnCardClicked?.Invoke(this);
     }
 
     public void FlipCard()
