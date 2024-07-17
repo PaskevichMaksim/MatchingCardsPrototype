@@ -35,6 +35,7 @@ namespace UI
         {
             _hintButton.onClick.AddListener(OnHintButtonClicked);
             _pauseButton.onClick.AddListener(OnPauseButtonClicked);
+            _gameManager.OnLevelStarted += UpdateLevelText;
             base.Awake();
         }
 

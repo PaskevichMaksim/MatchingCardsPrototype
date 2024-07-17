@@ -66,7 +66,6 @@ namespace UI
         {
             _mainMenu.Hide();
             _gameHUD.Show();
-            _gameHUD.UpdateLevelText(_gameManager.CurrentLevel);
             _gameManager.StartGame();
         }
     }
