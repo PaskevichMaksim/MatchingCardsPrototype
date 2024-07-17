@@ -2679,10 +2679,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb7f0bf476c89ac43887cca47e400721, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _flipSound: {fileID: 0}
-  _matchSound: {fileID: 0}
-  _winSound: {fileID: 0}
-  _loseSound: {fileID: 0}
+  _flipSound: {fileID: 8300000, guid: 15e9f634e944e104dab8ac20d84b5e12, type: 3}
+  _matchSound: {fileID: 8300000, guid: 8ce14858148c08a459f93602337335eb, type: 3}
+  _winSound: {fileID: 8300000, guid: 3830029b89ea7a04992156c6adbc327c, type: 3}
+  _loseSound: {fileID: 8300000, guid: 1d2f348735857f047b7a5defd60d930a, type: 3}
   _audioSource: {fileID: 844396795}
 --- !u!4 &844396794
 Transform:
