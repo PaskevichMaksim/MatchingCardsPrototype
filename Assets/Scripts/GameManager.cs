@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     }
     private void LoadGameData()
     {
-        _gameData = _saveManager.LoadData(SaveType.PlayerPrefs);
+        _gameData = _saveManager.LoadData(SaveType.Json);
         _currentLevel = _gameData.Level;
         
         _soundManager.SetSound(_gameData.SoundOn);
