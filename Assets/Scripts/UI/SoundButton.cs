@@ -1,6 +1,7 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
+
 namespace UI
 {
   public class SoundButton : MonoBehaviour
@@ -9,18 +10,21 @@ namespace UI
     [SerializeField] private Sprite _soundOnSprite;
     [SerializeField] private Sprite _soundOffSprite;
 
-    private Button _soundButton; 
-    private bool _isSoundOn;
+    private Button _soundButton;
+    private SoundManager _soundManager;
+
+    [Inject]
+    public void Construct(SoundManager soundManager)
+    {
+      _soundManager = soundManager;
+    }
 
     private void Awake()
     {
       _soundButton = GetComponent<Button>();
-    
       _soundButton.onClick.AddListener(ToggleSound);
-      LoadSoundState();
       UpdateButtonSprite();
     }
-
 
     private void OnEnable()
     {
@@ -34,27 +38,15 @@ namespace UI
 
     private void ToggleSound()
     {
-      _isSoundOn = !_isSoundOn;
-      AudioListener.volume = _isSoundOn ? 1 : 0;
+      bool isSoundOn = _soundManager.IsSoundOn;
+      _soundManager.SetSound(!isSoundOn);
       UpdateButtonSprite();
-      SaveSoundState();
-    }
-
-    private void SaveSoundState()
-    {
-      PlayerPrefs.SetInt(GameConstants.SOUND_PREF_KEY, _isSoundOn ? 1 : 0);
-      PlayerPrefs.Save();
-    }
-
-    private void LoadSoundState()
-    {
-      _isSoundOn = PlayerPrefs.GetInt(GameConstants.SOUND_PREF_KEY, 1) == 1;
-      AudioListener.volume = _isSoundOn ? 1 : 0;
     }
 
     private void UpdateButtonSprite()
     {
-      _soundImage.sprite = _isSoundOn ? _soundOnSprite : _soundOffSprite;
+      bool isSoundOn = _soundManager.IsSoundOn;
+      _soundImage.sprite = isSoundOn ? _soundOnSprite : _soundOffSprite;
     }
   }
 }

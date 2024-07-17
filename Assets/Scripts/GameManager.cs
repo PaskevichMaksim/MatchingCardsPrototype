@@ -2,7 +2,7 @@ using UnityEngine;
 using Zenject;
 using System;
 using System.Collections;
-using UI;
+using Save;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,18 +20,34 @@ public class GameManager : MonoBehaviour
     
     private GridManager _gridManager;
     private SoundManager _soundManager;
+    private SaveManager _saveManager;
+    private GameData _gameData;
     
     [Inject]
-    private void Construct(GridManager gridManager, SoundManager soundManager)
+    private void Construct(GridManager gridManager, SoundManager soundManager, SaveManager saveManager)
     {
         _gridManager = gridManager;
         _soundManager = soundManager;
+        _saveManager = saveManager;
     }
 
     private void Start()
     {
-        _currentLevel = PlayerPrefs.GetInt(GameConstants.PLAYER_PREFS_LEVEL_KEY, 1);
+        LoadGameData();
         StartLevel(_currentLevel);
+    }
+    private void LoadGameData()
+    {
+        _gameData = _saveManager.LoadData(SaveType.Json);
+        _currentLevel = _gameData.Level;
+        
+        _soundManager.SetSound(_gameData.SoundOn);
+    }
+    
+    private void SaveGameData()
+    {
+        _gameData.Level = _currentLevel;
+        _saveManager.SaveAllData(_gameData);
     }
 
     public void StartGame()
@@ -102,10 +118,14 @@ public class GameManager : MonoBehaviour
 
     private void CheckWinCondition()
     {
-        if (_gridManager.AllCardsMatched())
+        if (!_gridManager.AllCardsMatched())
         {
-            OnGameEnd?.Invoke(true);
+            return;
         }
+
+        OnGameEnd?.Invoke(true);
+        _currentLevel++;
+        SaveGameData();
     }
 
     public void ResetLevel()
@@ -116,9 +136,6 @@ public class GameManager : MonoBehaviour
 
     public void StartNextLevel()
     {
-        _currentLevel++;
-        PlayerPrefs.SetInt(GameConstants.PLAYER_PREFS_LEVEL_KEY, _currentLevel);
-        PlayerPrefs.Save();
         ResetLevel();
         StartLevel(_currentLevel);
     }

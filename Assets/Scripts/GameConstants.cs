@@ -13,4 +13,5 @@ public static class GameConstants
     
   public const string PLAYER_PREFS_LEVEL_KEY = "CurrentLevel";
   public const string SOUND_PREF_KEY = "SoundState";
+  public const string BASE_64_SAVE_KEY = "Base64Save";
 }

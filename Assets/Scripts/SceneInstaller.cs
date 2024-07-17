@@ -1,3 +1,4 @@
+using Save;
 using UI;
 using UnityEngine;
 using Zenject;
@@ -27,5 +28,15 @@ public class SceneInstaller : MonoInstaller
         Container.Bind<SoundManager>().FromInstance(_soundManager).AsSingle();
 
         Container.BindFactory<CardController, CardController.Factory>().FromComponentInNewPrefab(_cardPrefab);
+        
+        Save();
+    }
+
+    private void Save()
+    {
+        Container.BindInterfacesAndSelfTo<JsonSaveSystem>().AsSingle().WithArguments("game_data.json");
+        Container.BindInterfacesAndSelfTo<PlayerPrefsSaveSystem>().AsSingle();
+        Container.BindInterfacesAndSelfTo<Base64SaveSystem>().AsSingle();
+        Container.Bind<SaveManager>().AsSingle();
     }
 }
