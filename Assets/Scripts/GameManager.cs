@@ -15,9 +15,7 @@ public class GameManager : MonoBehaviour
     private bool _canFlip = true;
     private int _currentLevel;
     private Coroutine _hideCardsCoroutine;
-    
-    public int CurrentLevel => _currentLevel;
-    
+
     private GridManager _gridManager;
     private SoundManager _soundManager;
     private SaveManager _saveManager;
