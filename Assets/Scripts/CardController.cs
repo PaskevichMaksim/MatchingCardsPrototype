@@ -17,7 +17,6 @@ public class CardController : MonoBehaviour
     private GameManager _gameManager;
     private Sequence _sequence;
 
-
     [Inject]
     public void Construct(GameManager gameManager)
     {
@@ -134,6 +133,11 @@ public class CardController : MonoBehaviour
         _isMatched = false;
         _cardImage.color = new Color(_cardImage.color.r, _cardImage.color.g, _cardImage.color.b, 1);
         ShowBack();
+    }
+
+    public bool IsMatched()
+    {
+        return _isMatched;
     }
 
     public class Factory : PlaceholderFactory<CardController> { }

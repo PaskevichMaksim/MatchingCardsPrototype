@@ -1,18 +1,37 @@
 using UnityEngine;
 using Zenject;
+using System.Collections;
+using UI;
 
 public class HintSystem : MonoBehaviour
 {
-  private GameManager _gameManager;
+  private GridManager _gridManager;
+  private UIManager _uiManager;
 
   [Inject]
-  public void Construct(GameManager gameManager)
+  private void Construct(GridManager gridManager, UIManager uiManager)
   {
-    _gameManager = gameManager;
+    _gridManager = gridManager;
+    _uiManager = uiManager;
   }
 
   public void ShowHint()
   {
-    // Логика подсказки
+    StartCoroutine(ShuffleAndShowHint());
+  }
+
+  private IEnumerator ShuffleAndShowHint()
+  {
+    _uiManager.SetHintButtonInteractable(false);
+
+    yield return _gridManager.AnimateCardsShuffle();
+    _gridManager.ShuffleCardSprites();
+
+    _gridManager.ShowAllCards();
+    yield return new WaitForSeconds(GameConstants.HIDE_DELAY_AFTER_SHUFFLE);
+
+    _gridManager.HideAllCards();
+
+    _uiManager.SetHintButtonInteractable(true);
   }
 }

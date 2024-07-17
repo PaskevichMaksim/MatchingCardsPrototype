@@ -1,19 +1,20 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Random = UnityEngine.Random;
 
 public class GridManager : MonoBehaviour
 {
     [SerializeField] private Transform _cardField;
     [SerializeField] private Sprite[] _cardSprites;
     [SerializeField] private GridLayoutGroup _gridLayoutGroup;
-    
+        
     private CardController.Factory _cardFactory;
     private List<CardController> _cards = new List<CardController>();
+    private Vector3[] _originalCardPositions;
+    private CardShuffler _cardShuffler;
 
     [Inject]
     private void Construct(CardController.Factory cardFactory)
@@ -21,7 +22,7 @@ public class GridManager : MonoBehaviour
         _cardFactory = cardFactory;
     }
 
-    public void SetupGrid(int level, Action<CardController> onCardClicked)
+    public void SetupGrid(int level, System.Action<CardController> onCardClicked)
     {
         ResetGrid();
         int totalCards = level * GameConstants.LEVEL_MULTIPLIER;
@@ -30,16 +31,29 @@ public class GridManager : MonoBehaviour
         SetupGridLayout(rows, cols);
 
         var sprites = GetRandomSprites(totalCards / 2);
-        sprites = sprites.Concat(sprites).OrderBy(s => Random.value).ToList(); // Перемешиваем спрайты и дублируем их для пар
+        sprites = sprites.Concat(sprites).OrderBy(s => Random.value).ToList();
+
+        _originalCardPositions = new Vector3[totalCards];
 
         for (int i = 0; i < totalCards; i++)
         {
             var card = _cardFactory.Create();
             card.transform.SetParent(_cardField, false);
             card.SetFrontSprite(sprites[i]);
-            card.ShowFront(); // Карточки спавнятся лицевой стороной
+            card.ShowFront(); 
             card.OnCardClicked += onCardClicked;
             _cards.Add(card);
+            _originalCardPositions[i] = card.GetComponent<RectTransform>().anchoredPosition;
+        }
+
+        _cardShuffler = new CardShuffler(_cards);
+    }
+
+    public void ShowAllCards()
+    {
+        foreach (var card in _cards)
+        {
+            card.ShowFront();
         }
     }
 
@@ -47,7 +61,7 @@ public class GridManager : MonoBehaviour
     {
         foreach (var card in _cards)
         {
-            card.FlipCard(); // Переворачиваем карточки на обратную сторону
+            card.FlipCard();
         }
     }
 
@@ -58,6 +72,16 @@ public class GridManager : MonoBehaviour
             Destroy(card.gameObject);
         }
         _cards.Clear();
+    }
+
+    public void ShuffleCardSprites()
+    {
+        _cardShuffler.ShuffleCardSprites();
+    }
+
+    public IEnumerator AnimateCardsShuffle()
+    {
+        yield return _cardShuffler.AnimateCardsShuffle();
     }
 
     private void CalculateGridSize(int totalCards, out int rows, out int cols)
@@ -90,6 +114,9 @@ public class GridManager : MonoBehaviour
     {
         return _cardSprites.OrderBy(s => Random.value).Take(count).ToList();
     }
-    
-    
+
+    public bool AllCardsMatched()
+    {
+        return _cards.All(card => card.IsMatched());
+    }
 }
