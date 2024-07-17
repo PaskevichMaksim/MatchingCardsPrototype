@@ -4,13 +4,17 @@ using Zenject;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Random = UnityEngine.Random;
 
 public class GridManager : MonoBehaviour
 {
     [SerializeField] private Transform _cardField;
     [SerializeField] private Sprite[] _cardSprites;
     [SerializeField] private GridLayoutGroup _gridLayoutGroup;
-        
+
+    private RectTransform _cardFieldRectTransform;
+    private Vector2 _originalCardFieldSize;
+
     private CardController.Factory _cardFactory;
     private List<CardController> _cards = new List<CardController>();
     private Vector3[] _originalCardPositions;
@@ -22,9 +26,17 @@ public class GridManager : MonoBehaviour
         _cardFactory = cardFactory;
     }
 
+    private void Awake()
+    {
+        _cardFieldRectTransform = _cardField.GetComponent<RectTransform>();
+        _originalCardFieldSize = _cardFieldRectTransform.sizeDelta;
+    }
+
     public void SetupGrid(int level, System.Action<CardController> onCardClicked)
     {
         ResetGrid();
+        _cardFieldRectTransform.sizeDelta = _originalCardFieldSize;
+
         int totalCards = level * GameConstants.LEVEL_MULTIPLIER;
 
         CalculateGridSize(totalCards, out int rows, out int cols);
@@ -72,6 +84,7 @@ public class GridManager : MonoBehaviour
             Destroy(card.gameObject);
         }
         _cards.Clear();
+        _cardFieldRectTransform.sizeDelta = _originalCardFieldSize;
     }
 
     public void ShuffleCardSprites()
@@ -99,13 +112,13 @@ public class GridManager : MonoBehaviour
         _gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         _gridLayoutGroup.constraintCount = cols;
 
-        float parentWidth = _cardField.GetComponent<RectTransform>().rect.width;
-        float parentHeight = _cardField.GetComponent<RectTransform>().rect.height;
+        float parentWidth = _cardFieldRectTransform.rect.width;
+        float parentHeight = _cardFieldRectTransform.rect.height;
 
         float cellWidth = (parentWidth - (cols - 1) * _gridLayoutGroup.spacing.x) / cols;
         float cellHeight = (parentHeight - (rows - 1) * _gridLayoutGroup.spacing.y) / rows;
 
-        float cellSize = Mathf.Min(cellWidth, cellHeight);
+        float cellSize = Mathf.Min(cellWidth, cellHeight, GameConstants.MAX_CARD_SIZE);
 
         _gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
     }
