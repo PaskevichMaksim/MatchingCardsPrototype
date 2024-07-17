@@ -15,6 +15,8 @@ public class SceneInstaller : MonoInstaller
     private HintSystem _hintSystem;
     [SerializeField]
     private UIManager _uiManager;
+    [SerializeField]
+    private SoundManager _soundManager;
     
     public override void InstallBindings()
     {
@@ -22,6 +24,7 @@ public class SceneInstaller : MonoInstaller
         Container.Bind<GridManager>().FromInstance(_gridManager).AsSingle();
         Container.Bind<HintSystem>().FromInstance(_hintSystem).AsSingle();
         Container.Bind<UIManager>().FromInstance(_uiManager).AsSingle();
+        Container.Bind<SoundManager>().FromInstance(_soundManager).AsSingle();
 
         Container.BindFactory<CardController, CardController.Factory>().FromComponentInNewPrefab(_cardPrefab);
     }

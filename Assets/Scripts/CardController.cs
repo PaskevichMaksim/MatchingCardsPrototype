@@ -14,13 +14,14 @@ public class CardController : MonoBehaviour
     private bool _isFlipped;
     private bool _isMatched;
     private bool _turning;
-    private GameManager _gameManager;
     private Sequence _sequence;
 
+    private SoundManager _soundManager;
+
     [Inject]
-    public void Construct(GameManager gameManager)
+    public void Construct(SoundManager soundManager)
     {
-        _gameManager = gameManager;
+        _soundManager = soundManager;
     }
 
     private void Awake()
@@ -53,14 +54,14 @@ public class CardController : MonoBehaviour
             return;
         }
 
+        _soundManager.PlayFlipSound();
         _isFlipped = !_isFlipped;
         _turning = true;
 
         if (_isFlipped)
         {
             DoFlip(_backSprite, _frontSprite);
-        }
-        else
+        } else
         {
             DoFlip(_frontSprite, _backSprite);
         }
@@ -81,7 +82,7 @@ public class CardController : MonoBehaviour
             });
     }
 
-    public void ShowBack()
+    private void ShowBack()
     {
         _cardImage.sprite = _backSprite;
         _isFlipped = false;
@@ -91,24 +92,6 @@ public class CardController : MonoBehaviour
     {
         _cardImage.sprite = _frontSprite;
         _isFlipped = true;
-    }
-
-    public bool IsFlipped()
-    {
-        return _isFlipped;
-    }
-
-    public void SetFlipped(bool flipped)
-    {
-        _isFlipped = flipped;
-        if (flipped)
-        {
-            ShowFront();
-        }
-        else
-        {
-            ShowBack();
-        }
     }
 
     public void SetFrontSprite(Sprite sprite)
@@ -126,13 +109,6 @@ public class CardController : MonoBehaviour
         _isMatched = true;
         _sequence = DOTween.Sequence();
         _sequence.Append(_cardImage.DOFade(0, GameConstants.FLIP_DURATION));
-    }
-
-    public void ResetCard()
-    {
-        _isMatched = false;
-        _cardImage.color = new Color(_cardImage.color.r, _cardImage.color.g, _cardImage.color.b, 1);
-        ShowBack();
     }
 
     public bool IsMatched()

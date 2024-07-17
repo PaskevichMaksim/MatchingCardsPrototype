@@ -14,15 +14,18 @@ public class GameManager : MonoBehaviour
     private CardController _secondCard;
     private bool _canFlip = true;
     private int _currentLevel;
-    private GridManager _gridManager;
     private Coroutine _hideCardsCoroutine;
-
+    
     public int CurrentLevel => _currentLevel;
-
+    
+    private GridManager _gridManager;
+    private SoundManager _soundManager;
+    
     [Inject]
-    private void Construct(GridManager gridManager, UIManager uiManager)
+    private void Construct(GridManager gridManager, SoundManager soundManager)
     {
         _gridManager = gridManager;
+        _soundManager = soundManager;
     }
 
     private void Start()
@@ -82,6 +85,7 @@ public class GameManager : MonoBehaviour
 
         if (_firstCard.GetFrontSprite() == _secondCard.GetFrontSprite())
         {
+            _soundManager.PlayMatchSound();
             _firstCard.Disappear();
             _secondCard.Disappear();
             CheckWinCondition();

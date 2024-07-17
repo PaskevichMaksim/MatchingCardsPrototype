@@ -10,15 +10,18 @@ namespace UI
     [SerializeField] private Button _conclusionButton;
     [SerializeField] private Button _conclusionMenuButton;
 
+    private bool _isWin;
+    
     private GameManager _gameManager;
     private UIManager _uiManager;
-    private bool _isWin;
+    private SoundManager _soundManager;
 
     [Inject]
-    public void Construct(GameManager gameManager, UIManager uiManager)
+    public void Construct(GameManager gameManager, UIManager uiManager, SoundManager soundManager)
     {
       _gameManager = gameManager;
       _uiManager = uiManager;
+      _soundManager = soundManager;
     }
 
     public override void Awake()
@@ -56,7 +59,8 @@ namespace UI
       _isWin = isWin;
       _conclusionText.text = isWin ? "You Win!" : "Time's up! You lost.";
       _conclusionButton.GetComponentInChildren<TextMeshProUGUI>().text = isWin ? "Next Level" : "Restart Level";
-      gameObject.SetActive(true);
+      _soundManager.PlayConclusionSound(isWin);
+      Show();
     }
   }
 }
